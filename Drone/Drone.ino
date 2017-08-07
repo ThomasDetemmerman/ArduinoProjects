@@ -35,9 +35,7 @@
  *      Rechts centraal: 1489.00 - 1473.00 (channel 1)
  *      Rechts boven: 1987.00 - 1972.00 (channel 1) //voorruit
  *      
- *      Rechts links: 1490.00 - 1473.00 (channel 0) //links
- *      rechts centraal: 1495.00 - 1473.00 (channel 0)
- *      Rechts rechts: 1539.00 - 1515.00 (channel 0) //rechts
+ *      Rechts: 987 - 1980
  *            
  * 
  * 
@@ -54,6 +52,7 @@
 
 Servo motA, motB, motC, motD;
 int channel0, channel1, channel2, channel3;
+int speedEscA, speedEscB, speedEscC, speedEscD;
 char data;
 
 /**
@@ -85,15 +84,25 @@ channel1 =  pulseIn(9, HIGH);
 channel2 =  pulseIn(10, HIGH);
 channel3 =  pulseIn(11, HIGH);
 
-channel1 = map(channel0, 988, 1986, -180, 180); // full throttle = 179, low thorttle = -180, neutrol = 0 tot +2
+channel1 = map(channel1, 988, 1986, -180, 180); // full throttle = 179, low thorttle = -180, neutrol = 0 tot +2
 channel2 = map(channel2, 1011, 1940, 0, 180);
+channel0 = map(channel0,987, 1980, -180, 180);
 
-channel2 = normalizethrottle(channel2);
+speedEscA = calculatTotalSpeed('A', channel2, channel1, channel0);
+speedEscB = calculatTotalSpeed('B', channel2, channel1, channel0);
+speedEscC = calculatTotalSpeed('C', channel2, channel1, channel0);
+speedEscD = calculatTotalSpeed('D', channel2, channel1, channel0);
 
+Serial.print(speedEscA);
+Serial.print("\t");
+Serial.print(speedEscB);
+Serial.print("\t");
+Serial.print(speedEscC);
+Serial.print("\t");
+Serial.print(speedEscD);
+Serial.println("\t");
 
-
- Serial.println(channel2);
-writeToFourESC(channel2);
+writeToESC(speedEscA, speedEscB, speedEscC, speedEscD);
 }
 
 /**
@@ -126,24 +135,39 @@ void writeToESC(int throttleEscA, int throttleEscB, int throttleEscC, int thrott
     motD.write(throttleEscD);
 }
 
-int calculatTotalSpeed(int channel2, int channel1, int channel0)
+int calculatTotalSpeed(char motorID, int channel2, int channel1, int channel0)
 {
-  int totalSpeed = channel2 + (1/18 * channel1) + channel0;
+  int backpropellors = 0;
+  int leftpropellors = 0;
+  if ((motorID == 'A') | (motorID == 'C'))
+  {
+    
+    leftpropellors = 1;
+  }
+  if ((motorID == 'C') || (motorID == 'D'))
+  {
+    
+    backpropellors = 1;
+  }
+
+  // 1/1 = vervangen door een betere waarde. bv 1/180
+  int totalSpeed = channel2 + ( 1/1 * channel1) * backpropellors + (1/1 * channel0) * leftpropellors;
+  
   return normalizethrottle(totalSpeed);
    
 }
 int normalizethrottle(int throttle){
-  if(throttle < 0){
-    Serial.println("normalize throttle to 0");
+  if(throttle < 6){
+    
     return 0;
     
   }
   if(throttle > 180){
-    Serial.println("normalize throttle to 180");
+    
     return 180;
     
   }
-  Serial.print("throttle not normalized");
+  
   return throttle;
 }
 
