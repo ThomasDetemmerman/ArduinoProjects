@@ -25,6 +25,17 @@
  *   C            D
  * 
  * 
+ *      A = CW (pusher "R" propellor)
+ *      B = CCW (normal porpellor)
+ *      C = CCW (normal propellor)
+ *      D = CW (Pusher "R" propellor)
+ *      
+ *      -> R signiture is indicated on the propellor itself
+ * 
+ * 
+ * 
+ * 
+ * 
  * 
  * 
  *  Controller:
