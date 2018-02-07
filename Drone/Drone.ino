@@ -54,23 +54,27 @@ Servo motA, motB, motC, motD;
 int channel0, channel1, channel2, channel3;
 int speedEscA, speedEscB, speedEscC, speedEscD;
 char data;
-
+// eatch motor should be booted separatly with a short delay
+const int bootdelaytime = 500;
 /**
  * Initialisation routine
  */
 void setup() {
     Serial.begin(9600);
-
+    
     //radio freq
     pinMode(2, INPUT);
     
     //servo's
     motA.attach(4, 1000, 2000); // 1000 and 2000 are very important ! Values can be different with other ESCs.
-    motB.attach(5, 1000, 2000);
-    motC.attach(6, 1000, 2000);
-    motD.attach(7, 1000, 2000);
+    delay(bootdelaytime);
+    motB.attach(6, 1000, 2000);
+    delay(bootdelaytime);
+    motC.attach(7, 1000, 2000);
+    delay(bootdelaytime);
+    motD.attach(5, 1000, 2000);
     
-    displayInstructions();
+  
 }
 
 /**
@@ -110,16 +114,7 @@ writeToESC(speedEscA, speedEscB, speedEscC, speedEscD);
  */
 
 
-/**
- * Displays instructions to user
- */
-void displayInstructions()
-{  
-    Serial.println("READY - PLEASE SEND INSTRUCTIONS AS FOLLOWING :");
-    Serial.println("\t0 : Sends 0 throttle");
-    Serial.println("\t1 : Sends 180 throttle");
-    Serial.println("\t2 : Runs test function\n");
-}
+
 
 void writeToFourESC(int throttle){
      motA.write(throttle);
@@ -157,17 +152,8 @@ int calculatTotalSpeed(char motorID, int channel2, int channel1, int channel0)
    
 }
 int normalizethrottle(int throttle){
-  if(throttle < 6){
-    
-    return 0;
-    
-  }
-  if(throttle > 180){
-    
-    return 180;
-    
-  }
-  
+  if(throttle < 6){ return 0;}
+  if(throttle > 180){return 180; }
   return throttle;
 }
 
